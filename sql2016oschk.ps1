@@ -1,3 +1,4 @@
+$srvName="Win2012R2Dep1"
 $os=get-wmiobject -class Win32_OperatingSystem
 Switch -Regex ($os.version)
 {
@@ -11,9 +12,9 @@ Switch -Regex ($os.version)
     {
         $os.version 
 <#
-        start-process wusa "\\servername\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64" /quiet /norestart
-        start-process \\servername\deploymentshare$\Applications\SQL2016OSCHK\clearcompressionflag.exe
-        wusa "\\servername\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919355-x64.msu" /quiet /norestart
+        start-process wusa "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64" /quiet /norestart
+        start-process \\$srvName\deploymentshare$\Applications\SQL2016OSCHK\clearcompressionflag.exe
+        wusa "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919355-x64.msu" /quiet /norestart
 #>     
         set $hotfix=null
         $hotfix=get-hotfix -id KB2919442 -ErrorAction SilentlyContinue
@@ -23,9 +24,9 @@ Switch -Regex ($os.version)
         }
         else
         {
-            $args = "\\servername\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64.msu"+" /quiet" + " /norestart"
+            $args = "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64.msu"+" /quiet" + " /norestart"
             start-process wusa $args -wait
-            start-process \\servername\deploymentshare$\Applications\SQL2016OSCHK\clearcompressionflag.exe -wait
+            start-process \\$srvName\deploymentshare$\Applications\SQL2016OSCHK\clearcompressionflag.exe -wait
        
         }
 
@@ -36,7 +37,7 @@ Switch -Regex ($os.version)
         }
         else
         {
-            $args = "\\servername\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919355-x64.msu" + " /quiet" + " /norestart"
+            $args = "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919355-x64.msu" + " /quiet" + " /norestart"
             start-process wusa $args -wait
         }
     }
@@ -49,5 +50,7 @@ Switch -Regex ($os.version)
 DEFAULT { "Version not listed"}
 }
 
-$args = " /ConfigurationFile=\\servername\deploymentshare$\Applications\SQL2016x64\Configurationfile.ini"  
-start-process \\servername\deploymentshare$\Applications\SQL2016x64\Setup.exe $args -wait
+$args = " /ConfigurationFile=\\$srvName\deploymentshare$\Applications\SQL2016\Configurationfile.ini"  
+start-process \\$srvName\deploymentshare$\Applications\SQL2016\Setup.exe $args -wait
+$argsSMS="/install /quiet"
+start-process \\$srvName\deploymentshare$\Applications\SQL2016oschk\sql2016sms\ssms-setup-enu.exe $argsSMS -wait
