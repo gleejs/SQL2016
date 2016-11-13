@@ -1,4 +1,4 @@
-$srvName="ServerName"
+$srvName="Win2012R2Dep2"
 $os=get-wmiobject -class Win32_OperatingSystem
 Switch -Regex ($os.version)
 {
@@ -12,10 +12,10 @@ Switch -Regex ($os.version)
     {
         $os.version 
 <#
-        start-process wusa "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64" /quiet /norestart
+        start-process wusa "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64.msu" /quiet /norestart
         start-process \\$srvName\deploymentshare$\Applications\SQL2016OSCHK\clearcompressionflag.exe
         wusa "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919355-x64.msu" /quiet /norestart
-#>     
+    
         set $hotfix=null
         $hotfix=get-hotfix -id KB2919442 -ErrorAction SilentlyContinue
         If($hotfix)
@@ -24,12 +24,13 @@ Switch -Regex ($os.version)
         }
         else
         {
-            $args = "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64.msu"+" /quiet" + " /norestart"
-            start-process wusa $args -wait
-            start-process \\$srvName\deploymentshare$\Applications\SQL2016OSCHK\clearcompressionflag.exe -wait
+            $args = "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\Windows8.1-KB2919442-x64.msu"
+            $args1 = " /quiet" + " /norestart"
+            start-process $args $args1 -wait
+            start-process "\\$srvName\deploymentshare$\Applications\SQL2016OSCHK\clearcompressionflag.exe" -wait
        
         }
-
+#> 
         $hotfix=get-hotfix -id KB2919355 -ErrorAction SilentlyContinue
         if($hotfix)
         {
@@ -46,11 +47,16 @@ Switch -Regex ($os.version)
 {
     #10.0.10586 Windows 10
     $os.version
+    $osVer="Windows10"
 }
 DEFAULT { "Version not listed"}
 }
 
 $args = " /ConfigurationFile=\\$srvName\deploymentshare$\Applications\SQL2016\Configurationfile.ini"  
-start-process \\$srvName\deploymentshare$\Applications\SQL2016\Setup.exe $args -wait
-$argsSMS="/install /quiet"
-start-process \\$srvName\deploymentshare$\Applications\SQL2016oschk\sql2016sms\ssms-setup-enu.exe $argsSMS -wait
+start-process "\\$srvName\deploymentshare$\Applications\SQL2016\Setup.exe" $args -wait
+if ($osVer="Windows10")
+{
+    $argsSMS=" /install /quiet"
+    start-process "\\$srvName\deploymentshare$\Applications\SQL2016oschk\ssms-setup-enu.exe" $argsSMS -wait
+}
+
