@@ -1,4 +1,4 @@
-$srvName="Win2012R2Dep2"
+$srvName="Servername"
 $os=get-wmiobject -class Win32_OperatingSystem
 Switch -Regex ($os.version)
 {
