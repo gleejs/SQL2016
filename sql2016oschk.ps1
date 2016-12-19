@@ -1,4 +1,8 @@
-$srvName="Servername"
+param(
+[string]$sqlver
+)
+Write-Host $sqlver
+$srvName=“Servername”
 $os=get-wmiobject -class Win32_OperatingSystem
 Switch -Regex ($os.version)
 {
@@ -52,8 +56,18 @@ Switch -Regex ($os.version)
 DEFAULT { "Version not listed"}
 }
 
+if($sqlver -eq "")
+{
+Write-Host "Installing SQL2016"
 $args = " /ConfigurationFile=\\$srvName\deploymentshare$\Applications\SQL2016\Configurationfile.ini"  
 start-process "\\$srvName\deploymentshare$\Applications\SQL2016\Setup.exe" $args -wait
+}
+else
+{
+Write-Host "Installing SQL2016SP1"
+$args = " /ConfigurationFile=\\$srvName\deploymentshare$\Applications\SQL2016SP1\Configurationfile.ini"  
+start-process "\\$srvName\deploymentshare$\Applications\SQL2016SP1\Setup.exe" $args -wait
+}
 if ($osVer="Windows10")
 {
     $argsSMS=" /install /quiet"
