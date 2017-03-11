@@ -6,3 +6,10 @@ else
 {
 Write-Host $sqlver
 }
+Function Test
+{
+   Write-Host "Test Function"
+}
+
+Test
+Write-Host $sqlver
